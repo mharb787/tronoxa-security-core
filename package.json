@@ -1,0 +1,23 @@
+{
+  "name": "@tronoxa/security-core-transparency",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Source-available TRONOXA wallet security transparency snapshot",
+  "license": "PolyForm-Shield-1.0.0",
+  "scripts": {
+    "test": "npm run test:signing && npm run test:vault",
+    "test:signing": "node scripts/security-signing-smoke.cjs",
+    "test:vault": "node scripts/wallet-vault-smoke.cjs"
+  },
+  "dependencies": {
+    "bip39": "3.1.0",
+    "buffer": "6.0.3",
+    "tronweb": "6.4.0"
+  },
+  "devDependencies": {
+    "typescript": "5.9.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
