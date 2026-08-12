@@ -1,0 +1,9 @@
+# Repository ownership does not change because the code is public.
+# Pull requests require review by the TRONOXA owner when branch protection is enabled.
+* @mharb787
+/.github/ @mharb787
+/src/ @mharb787
+/integrations/mobile-bsc/ @mharb787
+/packages/bsc-core/ @mharb787
+/provenance/ @mharb787
+/SECURITY.md @mharb787
