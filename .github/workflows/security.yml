@@ -113,10 +113,10 @@ jobs:
           {
             echo '# Automated Security Summary'
             echo
-            echo "- Commit: `$GITHUB_SHA`"
-            echo "- UTC run: `$(date -u +'%Y-%m-%dT%H:%M:%SZ')`"
+            printf -- '- Commit: `%s`\n' "$GITHUB_SHA"
+            printf -- '- UTC run: `%s`\n' "$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
             echo "- Build and security smoke tests: completed before scanning"
-            echo "- BSC provenance: verified by `npm test`"
+            echo '- BSC provenance: verified by `npm test`'
             echo "- npm audit: critical=$critical, high=$high, moderate=$moderate (exit $NPM_STATUS)"
             echo "- MobSFscan SARIF error-level results: $mobsf_errors (exit $MOBSF_STATUS)"
             if [ "$SOLIDITY_PRESENT" = 'true' ]; then

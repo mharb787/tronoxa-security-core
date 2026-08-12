@@ -17,3 +17,4 @@ export async function loadBscCore(): Promise<TronoxaBscCore> {
 export function resetBscCoreForTesting(): void {
   corePromise = null;
 }
+

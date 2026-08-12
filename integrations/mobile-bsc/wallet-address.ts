@@ -38,3 +38,4 @@ export async function deriveBscAddressForWallet(
 
   throw new Error('bsc_wallet_type_unsupported');
 }
+
