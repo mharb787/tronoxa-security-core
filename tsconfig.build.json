@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "types": ["node"]
+  },
+  "include": [
+    "src/index.ts",
+    "src/wallet/types.ts",
+    "src/wallet/tron-keys.ts",
+    "src/wallet/vault-codec.ts",
+    "src/security/transaction-validation.ts",
+    "src/signing/signed-transaction.ts",
+    "src/signing/tron-transactions.ts",
+    "src/permissions/*.ts"
+  ],
+  "exclude": [
+    "src/security/app-security.ts",
+    "src/wallet/storage.ts"
+  ]
+}

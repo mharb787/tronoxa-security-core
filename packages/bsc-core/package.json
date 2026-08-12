@@ -1,0 +1,42 @@
+{
+  "name": "@tronoxa/bsc-core",
+  "version": "0.1.0",
+  "description": "Signer-agnostic TypeScript core for Tronoxa BNB Smart Chain support",
+  "private": true,
+  "type": "module",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
+    }
+  },
+  "files": [
+    "dist/src",
+    "README.md",
+    "SECURITY.md",
+    "THREAT_MODEL.md",
+    "THIRD_PARTY_NOTICES.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "prepare": "npm run build",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build && node --test dist/tests/unit/*.test.js",
+    "test:testnet:read": "npm run build && node --test dist/tests/integration/testnet-read.test.js",
+    "audit": "npm audit --audit-level=high"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "ethers": "6.17.0"
+  },
+  "devDependencies": {
+    "@types/node": "20.19.30",
+    "typescript": "5.9.2"
+  },
+  "license": "Apache-2.0"
+}

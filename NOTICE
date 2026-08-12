@@ -1,2 +1,12 @@
-Required Notice: Copyright © 2026 TRONOXA. All rights reserved. https://tronoxa.com
-Licensor Line of Business: TRONOXA self-custody cryptocurrency wallet software, wallet security, local transaction signing, transaction broadcasting, multisig, swaps, and related digital-asset services. https://tronoxa.com
+TRONOXA Security Core
+Copyright © 2026 TRONOXA contributors.
+
+Except for packages/bsc-core, files in this repository are made available under
+the Mozilla Public License 2.0 (MPL-2.0).
+
+packages/bsc-core is the exact Apache-2.0-licensed executable snapshot vendored
+by the TRONOXA mobile application and retains its own LICENSE and notices.
+
+The TRONOXA name, logos and product branding are not granted under the software
+licenses. No production wallet secret, signing key or application-store signing
+credential is included.

@@ -1,0 +1,85 @@
+name: Reproducible Packages
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+concurrency:
+  group: security-core-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out exact source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Build and test
+        run: |
+          npm run build
+          npm test
+
+      - name: Create deterministic release artifacts
+        env:
+          SOURCE_DATE_EPOCH: '0'
+        run: |
+          install -d artifacts
+          npm pack --pack-destination artifacts
+          git archive --format=tar --prefix=tronoxa-security-core/ HEAD \
+            | gzip -n > artifacts/tronoxa-security-core-source.tar.gz
+          tar --sort=name --mtime='@0' --owner=0 --group=0 --numeric-owner \
+            -cf - packages/bsc-core \
+            | gzip -n > artifacts/tronoxa-bsc-core-0.1.0-public-snapshot.tar.gz
+          (
+            cd artifacts
+            sha256sum *.tgz *.tar.gz | LC_ALL=C sort > SHA256SUMS
+          )
+
+      - name: Verify checksums
+        run: cd artifacts && sha256sum --check SHA256SUMS
+
+      - name: Upload workflow evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-core-${{ github.sha }}
+          path: artifacts/*
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            artifacts/*.tgz
+            artifacts/*.tar.gz
+            artifacts/SHA256SUMS
+
+      - name: Attach artifacts to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          gh release view "$TAG" >/dev/null 2>&1 \
+            || gh release create "$TAG" --verify-tag --generate-notes
+          gh release upload "$TAG" artifacts/* --clobber

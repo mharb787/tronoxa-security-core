@@ -1,13 +1,36 @@
 {
-  "name": "@tronoxa/security-core-transparency",
+  "name": "@tronoxa/security-core",
   "version": "1.0.0",
-  "private": true,
-  "description": "Source-available TRONOXA wallet security transparency snapshot",
-  "license": "PolyForm-Shield-1.0.0",
+  "description": "Open-source TRONOXA wallet key, vault, transaction validation and signing security core",
+  "license": "MPL-2.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "integrations",
+    "packages",
+    "provenance",
+    "README.md",
+    "SECURITY.md",
+    "PUBLISHED_SCOPE.md",
+    "NOTICE",
+    "LICENSE"
+  ],
   "scripts": {
-    "test": "npm run test:signing && npm run test:vault",
+    "build": "tsc -p tsconfig.build.json",
+    "test": "npm run test:signing && npm run test:vault && npm run verify:provenance",
     "test:signing": "node scripts/security-signing-smoke.cjs",
-    "test:vault": "node scripts/wallet-vault-smoke.cjs"
+    "test:vault": "node scripts/wallet-vault-smoke.cjs",
+    "verify:provenance": "node scripts/verify-provenance.mjs",
+    "prepack": "npm run build && npm test"
   },
   "dependencies": {
     "bip39": "3.1.0",
@@ -15,7 +38,11 @@
     "tronweb": "6.4.0"
   },
   "devDependencies": {
+    "@types/node": "20.19.30",
     "typescript": "5.9.2"
+  },
+  "overrides": {
+    "ws": "^8.21.0"
   },
   "engines": {
     "node": ">=20"

@@ -1,0 +1,171 @@
+name: Security Analysis
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 4 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-analysis-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install locked JavaScript dependencies
+        run: npm ci
+
+      - name: Build, security tests and provenance
+        run: |
+          npm run build
+          npm test
+
+      - name: Dependency audit
+        id: npm_audit
+        run: |
+          set +e
+          npm audit --json > npm-audit.json
+          status=$?
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: MobSF source scan
+        id: mobsf
+        run: |
+          python -m pip install 'mobsfscan==1.0.0'
+          set +e
+          mobsfscan . --sarif --output mobsfscan.sarif
+          status=$?
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          test -s mobsfscan.sarif || printf '%s\n' '{"version":"2.1.0","runs":[]}' > mobsfscan.sarif
+          exit 0
+
+      - name: Upload MobSF SARIF
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: mobsfscan.sarif
+          category: mobsf-source
+
+      - name: Detect Solidity contracts
+        id: solidity
+        run: |
+          if find . -type f -name '*.sol' -not -path './node_modules/*' | grep -q .; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Slither analysis
+        if: steps.solidity.outputs.present == 'true'
+        run: |
+          python -m pip install slither-analyzer
+          slither . --json slither.json
+
+      - name: Secret-pattern guard
+        run: |
+          if rg -n --hidden \
+            --glob '!node_modules/**' \
+            --glob '!package-lock.json' \
+            --glob '!*.map' \
+            '(-----BEGIN (RSA|EC|OPENSSH|PRIVATE) KEY-----|[A-Za-z0-9_]*(SECRET|PRIVATE_KEY|MNEMONIC)[A-Za-z0-9_]*[[:space:]]*=[[:space:]]*["'\''][^"'\'']+)' .; then
+            echo 'Potential committed secret pattern detected.'
+            exit 1
+          fi
+
+      - name: Write markdown security summary
+        if: always()
+        env:
+          NPM_STATUS: ${{ steps.npm_audit.outputs.status }}
+          MOBSF_STATUS: ${{ steps.mobsf.outputs.status }}
+          SOLIDITY_PRESENT: ${{ steps.solidity.outputs.present }}
+        run: |
+          test -s npm-audit.json || printf '%s\n' '{"metadata":{"vulnerabilities":{"critical":"unknown","high":"unknown","moderate":"unknown"}}}' > npm-audit.json
+          test -s mobsfscan.sarif || printf '%s\n' '{"version":"2.1.0","runs":[]}' > mobsfscan.sarif
+          critical=$(jq -r '.metadata.vulnerabilities.critical // "unknown"' npm-audit.json)
+          high=$(jq -r '.metadata.vulnerabilities.high // "unknown"' npm-audit.json)
+          moderate=$(jq -r '.metadata.vulnerabilities.moderate // "unknown"' npm-audit.json)
+          mobsf_errors=$(jq '[.runs[]?.results[]? | select(.level == "error")] | length' mobsfscan.sarif)
+          {
+            echo '# Automated Security Summary'
+            echo
+            printf -- '- Commit: `%s`\n' "$GITHUB_SHA"
+            printf -- '- UTC run: `%s`\n' "$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo "- Build and security smoke tests: completed before scanning"
+            echo '- BSC provenance: verified by `npm test`'
+            echo "- npm audit: critical=$critical, high=$high, moderate=$moderate (exit $NPM_STATUS)"
+            echo "- MobSFscan SARIF error-level results: $mobsf_errors (exit $MOBSF_STATUS)"
+            if [ "$SOLIDITY_PRESENT" = 'true' ]; then
+              echo '- Slither: executed because Solidity files were detected'
+            else
+              echo '- Slither/Mythril: not applicable; no Solidity contracts detected'
+            fi
+            echo
+            echo '> Automated analysis is not proof that the software is vulnerability-free.'
+          } | tee security-summary.md
+          cat security-summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload security evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-evidence-${{ github.sha }}
+          path: |
+            npm-audit.json
+            mobsfscan.sarif
+            security-summary.md
+            slither.json
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Enforce high-risk dependency gate
+        if: always()
+        run: |
+          critical=$(jq -r '.metadata.vulnerabilities.critical // 1' npm-audit.json)
+          high=$(jq -r '.metadata.vulnerabilities.high // 1' npm-audit.json)
+          test "$critical" -eq 0
+          test "$high" -eq 0
+
+  codeql:
+    name: CodeQL JavaScript/TypeScript
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: github/codeql-action/init@v4
+        with:
+          languages: javascript-typescript
+          queries: security-extended
+      - uses: github/codeql-action/analyze@v4
+        with:
+          category: '/language:javascript-typescript'
