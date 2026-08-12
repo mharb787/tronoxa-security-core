@@ -38,3 +38,4 @@
 - Complete native BNB history requires an approved indexer; standard log polling is insufficient.
 - Reusing an imported private key across TRON and BSC increases cross-chain compromise impact.
 - Mainnet energy payment remains unsafe until custody, reconciliation, finality, failure, and refund policies are approved and tested.
+
