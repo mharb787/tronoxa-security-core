@@ -6,7 +6,7 @@ Security fixes target the latest `main` branch and the newest published release.
 
 ## Report a vulnerability privately
 
-Use [GitHub private vulnerability reporting](https://github.com/mharb787/tronoxa-security-core/security/advisories/new). If that channel is unavailable, contact the repository owner through the [TRONOXA Security Core repository](https://github.com/mharb787/tronoxa-security-core) and request a private channel before sending technical details.
+Use [GitHub private vulnerability reporting](https://github.com/mharb787/tronoxa-security-core/security/advisories/new). If that channel is unavailable, email [office@tronoxa.com](mailto:office@tronoxa.com) and request a private channel before sending technical details.
 
 Do not open a public issue for a vulnerability that may expose wallet secrets, enable unauthorized signing, redirect funds, bypass transaction confirmation, confuse chain/token identity or compromise a release artifact.
 
@@ -18,7 +18,7 @@ Include:
 - expected and observed result;
 - practical impact and suggested mitigation, if known.
 
-Never include a funded recovery phrase, private key, API credential, real user address, signed production payload or production configuration.
+Never send or include a Recovery Phrase, Private Key, PIN, OTP, API credential, real user address, signed production payload or production configuration.
 
 ## Response targets
 
