@@ -2,6 +2,8 @@
 
 [![Security](https://github.com/mharb787/tronoxa-security-core/actions/workflows/security.yml/badge.svg)](https://github.com/mharb787/tronoxa-security-core/actions/workflows/security.yml)
 [![Reproducible packages](https://github.com/mharb787/tronoxa-security-core/actions/workflows/build.yml/badge.svg)](https://github.com/mharb787/tronoxa-security-core/actions/workflows/build.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/mharb787/tronoxa-security-core/badge)](https://scorecard.dev/viewer/?uri=github.com/mharb787/tronoxa-security-core)
+[![SPDX SBOM](https://github.com/mharb787/tronoxa-security-core/actions/workflows/sbom.yml/badge.svg)](https://github.com/mharb787/tronoxa-security-core/actions/workflows/sbom.yml)
 [![License: MPL-2.0](https://img.shields.io/badge/License-MPL--2.0-blue.svg)](LICENSE)
 
 This repository publishes the security-sensitive wallet code used by TRONOXA for independent inspection. It contains TRON key derivation, encrypted-vault handling, transaction validation and local signing, plus the **actual BEP-20/BSC core package and mobile integration code** used by the application.
@@ -94,6 +96,13 @@ npm run verify:provenance
 ```
 
 These checks use synthetic fixtures only and do not connect to a funded wallet.
+
+## Supply-chain verification
+
+- The [OpenSSF Scorecard workflow](.github/workflows/scorecard.yml) publishes independently consumable repository-security results and uploads SARIF to GitHub code scanning.
+- The [SPDX SBOM workflow](.github/workflows/sbom.yml) generates an SPDX 2.3 software bill of materials directly from the committed npm lockfile and retains it as workflow evidence.
+- Third-party GitHub Actions are pinned to full commit SHAs to reduce mutable-tag supply-chain risk.
+- Security researchers can use the private disclosure process and good-faith guidance in [SECURITY.md](SECURITY.md). Public credit is recorded only with consent in [Security Acknowledgements](SECURITY_ACKNOWLEDGEMENTS.md).
 
 ## Reproducible package verification
 
