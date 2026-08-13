@@ -31,6 +31,20 @@ Never send or include a Recovery Phrase, Private Key, PIN, OTP, API credential, 
 
 Targets are best-effort, not a warranty. Reporters acting in good faith, avoiding privacy violations and fund movement, and allowing reasonable remediation time will be treated under a coordinated-disclosure approach.
 
+## Good-faith security research
+
+Research is in scope when it targets code published in this repository or an official TRONOXA property, uses accounts, devices and funds controlled by the researcher, minimizes data access, and stops after confirming the security impact.
+
+The following activities are out of scope:
+
+- accessing, changing or retaining another person's data;
+- moving or risking funds that the researcher does not own;
+- social engineering, phishing, denial of service, spam or physical attacks;
+- testing third-party services in a way that violates their terms;
+- publishing an unresolved vulnerability before coordinated disclosure.
+
+When a researcher follows this policy, makes a good-faith effort to avoid privacy harm and service disruption, and provides reasonable remediation time, TRONOXA will not initiate legal action solely for that policy-compliant research. This statement does not authorize unlawful activity, waive third-party rights or bind third parties.
+
 ## Local cryptographic boundary
 
 - **Mnemonic:** BIP-39 English wordlist validation.
@@ -51,4 +65,4 @@ TRONOXA is non-custodial, but it uses backend services for non-secret operations
 
 ## Disclosure credit
 
-With the reporter's consent, fixed advisories may credit the reporter. Public disclosure timing and technical detail must be coordinated to avoid exposing users before updates are available.
+With the reporter's consent, fixed advisories may credit the reporter in [Security Acknowledgements](SECURITY_ACKNOWLEDGEMENTS.md). Public disclosure timing and technical detail must be coordinated to avoid exposing users before updates are available.
