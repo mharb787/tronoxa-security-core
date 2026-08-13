@@ -1,0 +1,46 @@
+name: SPDX SBOM
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sbom-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  generate:
+    name: Generate SPDX SBOM
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out exact source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Generate SPDX 2.3 SBOM from the lockfile
+        run: npm sbom --sbom-format spdx > tronoxa-security-core.spdx.json
+
+      - name: Validate generated JSON and package identity
+        run: node -e "const fs=require('node:fs');const x=JSON.parse(fs.readFileSync('tronoxa-security-core.spdx.json','utf8'));if(x.spdxVersion!=='SPDX-2.3'||!x.name.includes('tronoxa-security-core'))process.exit(1)"
+
+      - name: Upload SBOM evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: tronoxa-security-core-sbom-${{ github.sha }}
+          path: tronoxa-security-core.spdx.json
+          if-no-files-found: error
+          retention-days: 90
