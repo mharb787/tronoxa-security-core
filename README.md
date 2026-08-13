@@ -8,6 +8,25 @@ This repository publishes the security-sensitive wallet code used by TRONOXA for
 
 It is not the complete TRONOXA product. UI, branding, pricing, order orchestration, deployment configuration and unrelated backend business logic remain outside this repository. The published security files are open source under MPL-2.0; the vendored BSC package retains Apache-2.0.
 
+## Official identity
+
+- Official website: [tronoxa.com](https://tronoxa.com/)
+- Security & Transparency: [tronoxa.com/security](https://tronoxa.com/security)
+- Verified official accounts: [tronoxa.com/official-links](https://tronoxa.com/official-links)
+- Google Play: [TRONOXA](https://play.google.com/store/apps/details?id=com.tronoxa.app)
+- Current public release: [v1.0.0](https://github.com/mharb787/tronoxa-security-core/releases/tag/v1.0.0), including `SHA256SUMS` and GitHub Build Provenance
+
+Only the website, store listing and accounts linked above should be treated as official TRONOXA identities.
+
+## TRON Energy and Stake 2.0
+
+TRON smart-contract execution consumes on-chain resources. TRC-20 transfers commonly require Energy; when sufficient Energy is unavailable, the TRON protocol may burn TRX for execution costs. TRONOXA's integrated Energy flow is a resource optimization, not custody or an off-chain substitute for the transaction:
+
+1. **Request:** the app requests Energy for the user's public TRON address and the expected resource requirement. No recovery phrase or private key is transmitted.
+2. **On-chain delegation:** the resource pool delegates Energy to that public address using TRON Stake 2.0 resource delegation. Delegation does not grant control of the account or signing authority.
+3. **Execution:** the user reviews and signs the TRC-20 transfer locally. The signed transaction is broadcast to TRON and consumes available delegated resources according to protocol rules.
+4. **Local security:** keys remain on the user's device throughout the flow. TRONOXA cannot reconstruct the wallet, approve the transfer or sign on the user's behalf.
+
 ## Security architecture
 
 ```mermaid
